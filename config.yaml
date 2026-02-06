@@ -1,0 +1,19 @@
+# PostgreSQL Backup Configuration
+
+# Database name to backup
+database_name: dvdrental
+
+# Directory where backups will be stored
+backup_dir: ~/backup
+
+# PostgreSQL user
+pg_user: postgres
+
+# PostgreSQL port
+port: 5432
+
+# PostgreSQL host
+host: localhost
+
+# Backup format: c (custom), t (tar), p (plain), d (directory)
+backup_format: c
