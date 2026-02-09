@@ -1,20 +1,7 @@
 import subprocess
 import os
 import datetime
-import yaml
 from preflight.main_checks import main_checks_and_load_conf
-
-
-def load_config(config_path: str) -> dict:
-    try:
-        with open(config_path, 'r') as file:
-            config = yaml.safe_load(file)
-        return config
-    except FileNotFoundError as e:
-        raise FileNotFoundError(f"Config file {config_path} not found: {e}")
-    except yaml.YAMLError as e:
-        raise ValueError(f"Invalid YAML in {config_path}: {e}")
-
 
 def archive_db(conf_dict) -> None:
     backup_file = os.path.expanduser(f"{conf_dict['backup_dir']}/backup_file_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.dump")
@@ -41,8 +28,10 @@ def archive_db(conf_dict) -> None:
 
 if __name__ == "__main__":
     try:
-        main_checks_and_load_conf("config.yaml")
+        conf_dict = main_checks_and_load_conf("config.yaml")
         print("Preflight checks passed. Starting backup...")
+        archive_db(conf_dict)
+
     except Exception as e:
         print(f"Preflight checks failed: {e}")
         exit(1)

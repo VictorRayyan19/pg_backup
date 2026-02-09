@@ -6,6 +6,13 @@ import subprocess
 It checks if the pg_dump command is available in the system and if the user has permission to execute it. 
 If any of these checks fail, it will raise an appropriate exception that should be handled"""
 
+
+###########################################################
+#!!!!!!!!!!!! TO DO !!!!!!!!!!!!#
+# - Add more checks for pg_dump, such as using only the secure paths to the command, and checking for the version of pg_dump to ensure compatibility with the PostgreSQL server version.
+# - Add logging instead of print statements for better error tracking and debugging.
+# - Add unit tests for these functions to ensure they work as expected and handle edge cases properly
+
 def check_pg_dump_exists_and_permitted() -> None:
     try:
         subprocess.run(
