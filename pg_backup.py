@@ -2,6 +2,8 @@ import subprocess
 import os
 import datetime
 import yaml
+from preflight.main_checks import main_checks_and_load_conf
+
 
 def load_config(config_path: str) -> dict:
     try:
@@ -13,31 +15,16 @@ def load_config(config_path: str) -> dict:
     except yaml.YAMLError as e:
         raise ValueError(f"Invalid YAML in {config_path}: {e}")
 
-def check_backup_dir_exists(backup_dir: str) -> None:
-    if not os.path.exists(os.path.expanduser(backup_dir)):
-        raise FileNotFoundError(f"Backup directory {backup_dir} does not exist.")
 
-def archive_and_apply_config(config: dict) -> None:
-    check_backup_dir_exists(config["backup_dir"])
-    archive_db(
-        config["database_name"],
-        config["backup_dir"],
-        config["pg_user"],
-        config["port"],
-        config["host"],
-        config["backup_format"]
-    )
-
-
-def archive_db(database_name: str, backup_dir: str, pg_user: str, port: int, host: str, backup_format: str,) -> None:
-    backup_file = os.path.expanduser(f"{backup_dir}/backup_file_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.dump")
+def archive_db(conf_dict) -> None:
+    backup_file = os.path.expanduser(f"{conf_dict['backup_dir']}/backup_file_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.dump")
     cmd = [
         "pg_dump",
-        "-U", pg_user,
-        "-h", host,
-        "-p", str(port),
-        "-d", database_name,
-        "-F", backup_format,
+        "-U", conf_dict["pg_user"],
+        "-h", conf_dict["host"],
+        "-p", str(conf_dict["port"]),
+        "-d", conf_dict["database_name"],
+        "-F", conf_dict["backup_format"],
         "-f", backup_file
     ]
     
@@ -54,8 +41,8 @@ def archive_db(database_name: str, backup_dir: str, pg_user: str, port: int, hos
 
 if __name__ == "__main__":
     try:
-        config = load_config("config.yaml")
-        archive_and_apply_config(config)
-        print("Backup process completed.")
-    except (FileNotFoundError, subprocess.SubprocessError, ValueError) as e:
-        print(f"Error : {e}")
+        main_checks_and_load_conf("config.yaml")
+        print("Preflight checks passed. Starting backup...")
+    except Exception as e:
+        print(f"Preflight checks failed: {e}")
+        exit(1)
