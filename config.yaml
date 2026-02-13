@@ -4,7 +4,7 @@
 database_name: dvdrental
 
 # Directory where backups will be stored
-backup_dir: ~/backup/test
+backup_dir: ~/backup
 
 # PostgreSQL user
 pg_user: postgres

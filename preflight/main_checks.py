@@ -11,7 +11,7 @@ def main_checks_and_load_conf(config_file_path: str) -> dict[str, str] | None:
     and if the config file has valid YAML syntax. 
 
     Fail:
-    If any of these checks fail, it will print an error message and return None.
+    If any of these checks fail, it will raise an appropriate exception.
 
     Pass:
     If all checks pass, it will return the configuration dictionary.
@@ -40,13 +40,13 @@ def main_checks_and_load_conf(config_file_path: str) -> dict[str, str] | None:
         return (conf_dict)
 
     except FileNotFoundError as e:
-        print(f"Error File Not Found: {e}")
+        raise FileNotFoundError(f"Error File Not Found: {e}") from e
     
     except ValueError as e:
-        print(f"Error Wrong Value: {e}")
+        raise ValueError(f"Error Wrong Value: {e}") from e
     
     except PermissionError as e:
-        print(f"Error Permission Denied: {e}")
+        raise PermissionError(f"Error Permission Denied: {e}") from e
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        raise RuntimeError(f"An unexpected error occurred: {e}") from e

@@ -8,6 +8,9 @@ def create_directory_if_not_exists(directory: str) -> None:
     try:
         if not os.path.exists(directory):
          os.makedirs(directory)
+
+    except PermissionError:
+        raise PermissionError(f"Permission denied when trying to create directory {directory}. Please check your permissions.")
     except Exception as e:
         raise OSError(f"Failed to create directory {directory}: {e}")
     
