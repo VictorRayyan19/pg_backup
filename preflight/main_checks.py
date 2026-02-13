@@ -1,10 +1,11 @@
 import yaml
 import os
+from typing import Optional
 from utils import fs_utils
 from utils.fs_utils import create_directory_if_not_exists
 from preflight.env_checks import check_pg_dump_exists_and_permitted
 
-def main_checks_and_load_conf(config_file_path: str) -> dict[str, str] | None:
+def main_checks_and_load_conf(config_file_path: str) -> Optional[dict[str, str]]:
     """
     This function performs the main checks for the backup script needed resources to operate. 
     It checks if the backup directory exists and creates it if it does not, if the config file exists, 
