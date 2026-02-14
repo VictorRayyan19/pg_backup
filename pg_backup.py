@@ -2,6 +2,8 @@ from preflight.main_checks import main_checks_and_load_conf
 from core.archive_db import archive_db
 
 
+# ! Note to do: add scp
+
 
 if __name__ == "__main__":
     try:
