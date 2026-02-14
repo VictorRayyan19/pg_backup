@@ -2,6 +2,7 @@
 import os
 import subprocess
 import datetime
+from preflight.env_checks import find_pg_dump_in_safe_paths
 from preflight.main_checks import main_checks_and_load_conf
 from utils.backup_extention_format import get_format_extension
 
@@ -17,13 +18,16 @@ def create_backup_object_name(conf_dict: dict[str, dict[str, str]]) -> str:
     filename = f"backup_file_{timestamp}{extension}"
     backup_file = os.path.expanduser(os.path.join(backup_dir, filename))
     return backup_file
+
+
 """ This finction is the core functionality of the app as it runs the
 pg_dump the secure way
 """
 def archive_db(conf_dict: dict[str, dict[str, str]]) -> None:
     backup_file = create_backup_object_name(conf_dict)
+    secure_pg_dump_path = find_pg_dump_in_safe_paths() 
     cmd = [
-        "/usr/bin/pg_dump",
+        secure_pg_dump_path,
         "-U", conf_dict["source"]["pg_user"],
         "-h", conf_dict["source"]["host"],
         "-p", str(conf_dict["source"]["port"]),

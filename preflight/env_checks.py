@@ -44,17 +44,8 @@ Finally, it attempts to execute pg_dump with the --version flag to verify that i
 """
 
 def check_pg_dump_exists_and_permitted() -> str:
-    try:
-        pg_dump_executable_path = find_pg_dump_in_safe_paths()
-        check_pg_dump_ownership(pg_dump_executable_path)
-    except FileNotFoundError as e:
-        raise FileNotFoundError(
-            f"pg_dump command not found in trusted directories: {e}"
-        )
-    except PermissionError as e:
-        raise PermissionError(f"Permission error with pg_dump: {e}")
-    except Exception as e:
-        raise RuntimeError(f"An unexpected error occurred while checking pg_dump: {e}")
+    pg_dump_executable_path = find_pg_dump_in_safe_paths()
+    check_pg_dump_ownership(pg_dump_executable_path)
     
     try:
         result = subprocess.run(
@@ -71,8 +62,7 @@ def check_pg_dump_exists_and_permitted() -> str:
         raise PermissionError(f"pg_dump exists at {pg_dump_executable_path} but is not executable by this user")
 
     except subprocess.CalledProcessError as e:
-        err = (e.stderr or "").strip() or "unknown error"
-        raise RuntimeError(f"pg_dump failed to execute: {err}")
+        raise RuntimeError(f"pg_dump failed to execute: {e.stderr.strip()}")
 
     return pg_dump_executable_path
 
@@ -83,26 +73,13 @@ It checks if the pg_dump executable is a regular file, if it is owned by root,
 and if it is not world-writable. If any of these checks fail, it will raise a PermissionError."""
 
 def check_pg_dump_ownership(pg_dump_path: str) -> None:
-    try:
-        st = os.stat(pg_dump_path)
-        if not stat.S_ISREG(st.st_mode):
-            raise PermissionError(
-                f"pg_dump at {pg_dump_path} is not a regular file. "
-                "Please check the ownership and permissions of the pg_dump executable."
-            )
-        if st.st_uid != 0:
-            raise PermissionError(
-                f"pg_dump at {pg_dump_path} is not owned by root. "
-                "Please check the ownership and permissions of the pg_dump executable."
-            )
-        if st.st_mode & stat.S_IWOTH:
-            raise PermissionError(
-                f"pg_dump at {pg_dump_path} is world-writable. "
-                "Please check the ownership and permissions of the pg_dump executable."
-            )
-    except OSError as e:
-        if e.errno == errno.ENOENT:
-            raise FileNotFoundError(f"pg_dump command not found at {pg_dump_path}. "
-                                    "Please ensure PostgreSQL client tools are installed and pg_dump is in your PATH.")
-        else:
-            raise RuntimeError(f"An error occurred while checking pg_dump ownership: {e}")
+    st = os.stat(pg_dump_path)
+    
+    if not stat.S_ISREG(st.st_mode):
+        raise PermissionError(f"pg_dump at {pg_dump_path} is not a regular file.")
+    
+    if st.st_uid != 0:
+        raise PermissionError(f"pg_dump at {pg_dump_path} is not owned by root.")
+    
+    if st.st_mode & stat.S_IWOTH:
+        raise PermissionError(f"pg_dump at {pg_dump_path} is world-writable.")
