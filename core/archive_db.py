@@ -5,7 +5,7 @@ import datetime
 from preflight.main_checks import main_checks_and_load_conf
 from utils.backup_extention_format import get_format_extension
 
-""" this function creates the backup file name based on the
+""" This function creates the backup file name based on the
  current timestamp and the backup format specified in the 
  configuration."""
 
@@ -17,7 +17,9 @@ def create_backup_object_name(conf_dict: dict[str, dict[str, str]]) -> str:
     filename = f"backup_file_{timestamp}{extension}"
     backup_file = os.path.expanduser(os.path.join(backup_dir, filename))
     return backup_file
-
+""" This finction is the core functionality of the app as it runs the
+pg_dump the secure way
+"""
 def archive_db(conf_dict: dict[str, dict[str, str]]) -> None:
     backup_file = create_backup_object_name(conf_dict)
     cmd = [
