@@ -11,9 +11,9 @@ If any of these checks fail, it will raise an appropriate exception that should 
 
 ###########################################################
 #!!!!!!!!!!!! TO DO !!!!!!!!!!!!#
-# - Add more checks for pg_dump, such as using only the secure paths to the command, and checking for the version of pg_dump to ensure compatibility with the PostgreSQL server version.
 # - Add logging instead of print statements for better error tracking and debugging.
-# - Add unit tests for these functions to ensure they work as expected and handle edge cases properly
+# - Add unit tests for these functions to ensure they work as expected and handle 
+# edge cases properly (may not be done as it is an file system check and may require mocking)
 
 def find_pg_dump_in_safe_paths() -> str:
     safe_dirs = [
@@ -35,6 +35,14 @@ def find_pg_dump_in_safe_paths() -> str:
 
     return pg_dump_executable_path
 
+
+"""
+This function checks if the pg_dump command exists in the system and if the user has permission to execute it.
+It first calls the find_pg_dump_in_safe_paths function to locate the pg_dump executable in trusted directories. 
+Then it checks the ownership and permissions of the pg_dump executable using the check_pg_dump_ownership function. 
+Finally, it attempts to execute pg_dump with the --version flag to verify that it is working properly.
+"""
+
 def check_pg_dump_exists_and_permitted() -> str:
     try:
         pg_dump_executable_path = find_pg_dump_in_safe_paths()
@@ -47,11 +55,6 @@ def check_pg_dump_exists_and_permitted() -> str:
         raise PermissionError(f"Permission error with pg_dump: {e}")
     except Exception as e:
         raise RuntimeError(f"An unexpected error occurred while checking pg_dump: {e}")
-    
-    pg_dump_permitted = os.access(pg_dump_executable_path, os.X_OK)
-
-    if not pg_dump_permitted:
-        raise PermissionError("Permission denied when trying to execute pg_dump. Please check your permissions.")
     
     try:
         result = subprocess.run(
@@ -84,18 +87,22 @@ def check_pg_dump_ownership(pg_dump_path: str) -> None:
         st = os.stat(pg_dump_path)
         if not stat.S_ISREG(st.st_mode):
             raise PermissionError(
-                f"pg_dump at {pg_dump_path} is not a regular file. Please check the ownership and permissions of the pg_dump executable."
+                f"pg_dump at {pg_dump_path} is not a regular file. "
+                "Please check the ownership and permissions of the pg_dump executable."
             )
         if st.st_uid != 0:
             raise PermissionError(
-                f"pg_dump at {pg_dump_path} is not owned by root. Please check the ownership and permissions of the pg_dump executable."
+                f"pg_dump at {pg_dump_path} is not owned by root. "
+                "Please check the ownership and permissions of the pg_dump executable."
             )
         if st.st_mode & stat.S_IWOTH:
             raise PermissionError(
-                f"pg_dump at {pg_dump_path} is world-writable. Please check the ownership and permissions of the pg_dump executable."
+                f"pg_dump at {pg_dump_path} is world-writable. "
+                "Please check the ownership and permissions of the pg_dump executable."
             )
     except OSError as e:
         if e.errno == errno.ENOENT:
-            raise FileNotFoundError(f"pg_dump command not found at {pg_dump_path}. Please ensure PostgreSQL client tools are installed and pg_dump is in your PATH.")
+            raise FileNotFoundError(f"pg_dump command not found at {pg_dump_path}. "
+                                    "Please ensure PostgreSQL client tools are installed and pg_dump is in your PATH.")
         else:
             raise RuntimeError(f"An error occurred while checking pg_dump ownership: {e}")
