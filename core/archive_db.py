@@ -3,16 +3,30 @@ import os
 import subprocess
 import datetime
 from preflight.main_checks import main_checks_and_load_conf
+from utils.backup_extention_format import get_format_extension
 
-def archive_db(conf_dict) -> None:
-    backup_file = os.path.expanduser(f"{conf_dict['backup_dir']}/backup_file_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.dump")
+""" this function creates the backup file name based on the
+ current timestamp and the backup format specified in the 
+ configuration."""
+
+def create_backup_object_name(conf_dict: dict[str, dict[str, str]]) -> str:
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    backup_dir = conf_dict["source"]["backup_dir"]
+    backup_format = conf_dict["source"]["backup_format"]
+    extension = get_format_extension(backup_format)
+    filename = f"backup_file_{timestamp}{extension}"
+    backup_file = os.path.expanduser(os.path.join(backup_dir, filename))
+    return backup_file
+
+def archive_db(conf_dict: dict[str, dict[str, str]]) -> None:
+    backup_file = create_backup_object_name(conf_dict)
     cmd = [
         "/usr/bin/pg_dump",
-        "-U", conf_dict["pg_user"],
-        "-h", conf_dict["host"],
-        "-p", str(conf_dict["port"]),
-        "-d", conf_dict["database_name"],
-        "-F", conf_dict["backup_format"],
+        "-U", conf_dict["source"]["pg_user"],
+        "-h", conf_dict["source"]["host"],
+        "-p", str(conf_dict["source"]["port"]),
+        "-d", conf_dict["source"]["database_name"],
+        "-F", conf_dict["source"]["backup_format"],
         "-f", backup_file
     ]
     

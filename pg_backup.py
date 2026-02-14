@@ -13,7 +13,10 @@ if __name__ == "__main__":
         exit(1)
 
     try:
+        if conf_dict is None:
+            raise ValueError("Configuration dictionary is None. Cannot proceed with backup.")
         archive_db(conf_dict)
+
     except Exception as e:
-        print(f"{e}")
+        print(f"Error during backup: {e}")
         exit(1)

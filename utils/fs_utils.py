@@ -14,7 +14,7 @@ def create_directory_if_not_exists(directory: str) -> None:
     except Exception as e:
         raise OSError(f"Failed to create directory {directory}: {e}")
     
-def load_yaml(file_path: str) -> dict:
+def load_yaml(file_path: str) -> dict[str, dict[str, str]]:
     try:
         with open(file_path, 'r') as f:
             data = yaml.safe_load(f)

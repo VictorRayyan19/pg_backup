@@ -1,19 +1,24 @@
 # PostgreSQL Backup Configuration
 
+
+
+source:
 # Database name to backup
-database_name: dvdrental
-
+  database_name: dvdrental
 # Directory where backups will be stored
-backup_dir: ~/backup
-
+  backup_dir: ~/backup
 # PostgreSQL user
-pg_user: postgres
-
+  pg_user: postgres
 # PostgreSQL port
-port: 5432
-
+  port: 5432
 # PostgreSQL host
-host: localhost
-
+  host: localhost
 # Backup format: c (custom), t (tar), p (plain), d (directory)
-backup_format: c
+  backup_format: d
+
+target:
+  host: localhost # Target host for backup (can be the same as source)
+  user: backup_user # SSH user for target host
+  port: 22 # SSH port for target host
+  path: /path/to/target # Directory on target host where backup will be stored
+  ssh_keys: ~/.ssh/id_rsa # Path to SSH private key for authenticationk
