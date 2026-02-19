@@ -17,8 +17,8 @@ source:
   backup_format: d
 
 target:
-  host: localhost # Target host for backup (can be the same as source)
-  user: backup_user # SSH user for target host
-  port: 22 # SSH port for target host
-  path: /path/to/target # Directory on target host where backup will be stored
+  host: 192.168.1.245 # Target host for backup (can be the same as source)
+  user: admin # SSH user for target host
+  port: 9543 # SSH port for target host
+  path: /home/admin/backups/remote # Directory on target host where backup will be stored
   ssh_keys: ~/.ssh/id_rsa # Path to SSH private key for authenticationk
