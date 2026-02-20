@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 def scp_backup_to_target(backup_path: str, conf_dict: dict[str, dict[str, str]]) -> None:
     target_conf = conf_dict["target"]
+    target_scp_options = f"{target_conf['user']}@{target_conf['host']}:{target_conf['path']}"
     is_dir = os.path.isdir(backup_path)
     scp_cmd = [
         "scp",
@@ -13,7 +14,7 @@ def scp_backup_to_target(backup_path: str, conf_dict: dict[str, dict[str, str]])
         "-i", target_conf["ssh_keys"],
         "-P", str(target_conf["port"]),
         backup_path,
-        f"{target_conf['user']}@{target_conf['host']}:{target_conf['path']}"
+        target_scp_options
     ]
     scp_cmd = [part for part in scp_cmd if part]
     
@@ -23,7 +24,7 @@ def scp_backup_to_target(backup_path: str, conf_dict: dict[str, dict[str, str]])
             capture_output=True,
             check=True
         )
-        logger.info("Backup successfully transferred to target: %s", target_conf["host"])
+        logger.info("Backup successfully transferred to target: %s, %s", target_conf["host"], target_conf["path"])
     except subprocess.CalledProcessError as e:
         raise subprocess.SubprocessError(f"SCP transfer failed: {e.stderr.decode()}")
     except Exception as e:
