@@ -1,9 +1,11 @@
-import errno
 import os
 import subprocess
 import shutil
 import stat
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 """ This module contains functions that check for the existence and permissions of the pg_dump command.
 It checks if the pg_dump command is available in the system and if the user has permission to execute it. 
@@ -44,7 +46,10 @@ Finally, it attempts to execute pg_dump with the --version flag to verify that i
 """
 
 def check_pg_dump_exists_and_permitted() -> str:
+    # Finding the secure pg_dump executable from the safe paths
     pg_dump_executable_path = find_pg_dump_in_safe_paths()
+    
+    # Check for permissions and security of the found binary
     check_pg_dump_ownership(pg_dump_executable_path)
     
     try:
@@ -56,7 +61,7 @@ def check_pg_dump_exists_and_permitted() -> str:
             check=True,
         )
 
-        print(f"pg_dump version: {result.stdout.strip()}")
+        logging.info(f"pg_dump version: {result.stdout.strip()}")
 
     except PermissionError:
         raise PermissionError(f"pg_dump exists at {pg_dump_executable_path} but is not executable by this user")
