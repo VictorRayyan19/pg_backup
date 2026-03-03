@@ -21,10 +21,10 @@ def get_format_extension(format_name: str) -> str:
  current timestamp and the backup format specified in the 
  configuration."""
 
-def create_backup_object_name(conf_dict: dict[str, dict[str, str]]) -> str:
+def create_backup_object_name(source_conf_dict: dict[str, str]) -> str:
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    backup_dir = conf_dict["source"]["backup_dir"]
-    backup_format = conf_dict["source"]["backup_format"]
+    backup_dir = source_conf_dict["backup_dir"]
+    backup_format = source_conf_dict["backup_format"]
     extension = get_format_extension(backup_format)
     filename = f"backup_file_{timestamp}{extension}"
     backup_file = os.path.expanduser(os.path.join(backup_dir, filename))

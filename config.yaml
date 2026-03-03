@@ -4,11 +4,11 @@
 
 source:
 # Database name to backup
-  database_name: dvdrental
+  database_name: victor
 # Directory where backups will be stored
   backup_dir: ~/backup
 # PostgreSQL user
-  pg_user: postgres
+  pg_user: victor
 # PostgreSQL port
   port: 5432
 # PostgreSQL host
@@ -17,8 +17,13 @@ source:
   backup_format: d
 
 target:
-  host: localhost # Target host for backup (can be the same as source)
-  user: backup_user # SSH user for target host
-  port: 22 # SSH port for target host
-  path: /path/to/target # Directory on target host where backup will be stored
-  ssh_keys: ~/.ssh/id_rsa # Path to SSH private key for authenticationk
+  # Target host for backup (can be the same as source)
+  host: 192.168.1.245 
+  # SSH user for target host
+  user: admin
+  # SSH port for target host
+  port: 9543
+  # Directory on target host where backup will be stored
+  path: /home/admin/backups/remote
+  # Path to SSH private key for authenticationk
+  ssh_keys: ~/.ssh/id_rsa
